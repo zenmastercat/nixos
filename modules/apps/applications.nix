@@ -62,6 +62,10 @@
       pkgs.bun # All in one fast & easy-to-use tool
       pkgs.home-manager # Home manager
       pkgs.usbimager
+      # For ROS2
+      rosPackages.humble.desktop
+      rosPackages.humble.ros-base
+      colcon
     ];
   };
 }
