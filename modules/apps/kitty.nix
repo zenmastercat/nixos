@@ -1,18 +1,27 @@
 { ... }:
 {
-  flake.modules.nixos.kitty = { pkgs, ... }: {
-    
-    programs.kitty = {
-      enable = true;
-      font = {
-        name = "JetBrainsMono Nerd Font";
-        size = 12;
-      };
-      settings = {
-        background_opacity = "0.5";
-        confirm_os_window_close = 0;
+  flake.modules = {
+    # Home Manager Aspect (Terminal config, font, opacity)
+    homeManager.kitty = { pkgs, ... }: {
+      programs.kitty = {
+        enable = true;
+        font = {
+          name = "JetBrainsMono Nerd Font";
+          size = 12;
+        };
+        settings = {
+          background_opacity = "0.5";
+          confirm_os_window_close = 0;
+        };
       };
     };
 
+    # NixOS Aspect (System-level package install, if needed)
+    nixos.kitty = { pkgs, ... }: {
+      environment.systemPackages = [ pkgs.kitty ];
+    };
+    # Bash -> Fish
+    programs.fish.enable = true;
+    
   };
 }

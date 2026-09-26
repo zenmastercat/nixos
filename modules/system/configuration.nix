@@ -3,6 +3,7 @@
   flake.modules.nixos.system = { config, pkgs, libs, ... }: {
     imports = [
       self.nixosModules.customKernel
+      self.nixosModules.plymouth-splash-kde
     ];
 
     # Merged nix.settings block (Dynamic resource allocation + Cuda cache)
