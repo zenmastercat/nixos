@@ -58,6 +58,7 @@ in
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
+      backupFileExtension = "backup";
       users.lucas = {
         imports = [
           homeManager.fish
