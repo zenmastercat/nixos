@@ -1,11 +1,11 @@
 { self, ... }:
 {
-  flake.nixosModules.plymouth-splash-kde = { config, pkgs, libs, ... }: {
+  flake.nixosModules.plymouth-splash-kde = { config, pkgs, lib, ... }: {
     boot = {
       plymouth = {
         enable = true;
         # Optional: choose a specific theme package if you have one installed or packaged
-        theme = "AccretionDisk"; 
+        # theme = "AccretionDisk"; 
       };
   
   # Quiet the kernel logs so text doesn't bleed through the splash screen

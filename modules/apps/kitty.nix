@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 {
   flake.modules = {
     # Home Manager Aspect (Terminal config, font, opacity)
@@ -10,6 +10,7 @@
           size = 12;
         };
         settings = {
+          shell = "${pkgs.fish}/bin/fish";
           background_opacity = "0.5";
           confirm_os_window_close = 0;
         };
@@ -20,8 +21,6 @@
     nixos.kitty = { pkgs, ... }: {
       environment.systemPackages = [ pkgs.kitty ];
     };
-    # Bash -> Fish
-    programs.fish.enable = true;
-    
+
   };
 }
