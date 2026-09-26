@@ -1,6 +1,13 @@
-{ ... }:
+{ config, ... }:
+let
+  inherit (config.flake.modules) nixos;
+in
 {
   flake.modules.nixos.applications = { pkgs, ... }: {
+    imports = [
+      nixos.styupideasyapps
+    ];
+
     fonts.packages = with pkgs; [
        corefonts  # Arial, Times New Roman, Comic Sans, etc.
        vista-fonts # Calibri, Consolas, Constantia, etc.
@@ -10,8 +17,7 @@
     environment.systemPackages = with pkgs; [
       git
       vim
-      wget
-      btop                 # System resource monitor
+      wget                 # System resource monitor
       nvtopPackages.full   # GPU process monitor
       libreoffice
       discord

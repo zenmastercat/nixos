@@ -1,11 +1,17 @@
-{ ... }:
+{ self, ... }:
 {
-  flake.modules.nixos.system = { config, pkgs, ... }: {
-    # Dynamic resource allocation for Intel Core Ultra 9
+  flake.modules.nixos.system = { config, pkgs, libs, ... }: {
+    imports = [
+      self.nixosModules.customKernel
+    ];
+
+    # Merged nix.settings block (Dynamic resource allocation + Cuda cache)
     nix.settings = {
       experimental-features = [ "nix-command" "flakes" ];
       max-jobs = "auto";
       cores = 12; # Dynamically utilizes all P-cores and E-cores
+      substituters = [ "https://cache.nixos-cuda.org/" ];
+      trusted-public-keys = [ "cache.nixos-cuda.org-1:2hhlatXA9C9gld3u0N+J85z0dZ/9/Q16Z03l5w9d2d0=" ];
     };
 
     # Nix Store Cleanup & Optimization
@@ -27,8 +33,7 @@
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
-    # Kernel Setup (Pinned to Linux 6.12 LTS for NVIDIA module compilation stability)
-    boot.kernelPackages = pkgs.linuxPackages_6_12;
+    # Kernel Setup (Removed boot.kernelPackages to avoid conflict with kernel.nix)
     boot.initrd.kernelModules = [ "xe" ];
     boot.kernelParams = [ "nvidia-drm.modeset=1" ];
 
@@ -48,14 +53,14 @@
     };
 
     # NVIDIA RTX 5080 Desktop Configuration
-    hardware.nvidia = {
-      modesetting.enable = true;
-      powerManagement.enable = true;
-      powerManagement.finegrained = false;
-      open = true; # Mandatory open-source kernel modules for RTX 50-series (Blackwell)
-      nvidiaSettings = true;
-      package = config.boot.kernelPackages.nvidiaPackages.beta;
-    };
+    # hardware.nvidia = {
+    #   modesetting.enable = true;
+    #   powerManagement.enable = true;
+    #   powerManagement.finegrained = false;
+    #   open = true; # Mandatory open-source kernel modules for RTX 50-series (Blackwell)
+    #   nvidiaSettings = true;
+    #   package = config.boot.kernelPackages.nvidiaPackages.beta;
+    # };
 
     # Desktop Environment (XFCE4 + LightDM on X11)
     services.xserver = {
@@ -85,7 +90,8 @@
 
     # Time & Regional Settings
     time.timeZone = "Asia/Bangkok";
-    i18n.defaultLocale = "en_US.UTF-8";
+    # i18n.defaultLocale = "en_US.UTF-8";
+    i18n.defaultLocale = "ja_JP.UTF-8";
     i18n.extraLocaleSettings = {
       LC_ADDRESS = "en_US.UTF-8";
       LC_IDENTIFICATION = "en_US.UTF-8";
