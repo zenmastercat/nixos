@@ -6,11 +6,13 @@ in
   flake.modules.nixos.applications = { pkgs, ... }: {
     imports = [
       nixos.styupideasyapps
+      nixos.kitty
     ];
 
     fonts.packages = with pkgs; [
        corefonts  # Arial, Times New Roman, Comic Sans, etc.
        vista-fonts # Calibri, Consolas, Constantia, etc.
+       pkgs.nerd-fonts.jetbrains-mono
     ];
     
     nixpkgs.config.allowUnfree = true;
@@ -46,24 +48,24 @@ in
       easyeffects
       pkgs.chromium
       # For XFCE
-      xfce.catfish
-      xfce.gigolo
-      xfce.orage
-      xfce.xfburn
-      xfce.xfce4-appfinder
-      xfce.xfce4-clipman-plugin
-      xfce.xfce4-cpugraph-plugin
-      xfce.xfce4-dict
-      xfce.xfce4-fsguard-plugin
-      xfce.xfce4-genmon-plugin
-      xfce.xfce4-netload-plugin
-      xfce.xfce4-panel
-      xfce.xfce4-pulseaudio-plugin
-      xfce.xfce4-systemload-plugin
-      xfce.xfce4-weather-plugin
-      xfce.xfce4-whiskermenu-plugin
-      xfce.xfce4-xkb-plugin
-      xfce.xfdashboard
+      # xfce.catfish
+      # xfce.gigolo
+      # xfce.orage
+      # xfce.xfburn
+      # xfce.xfce4-appfinder
+      # xfce.xfce4-clipman-plugin
+      # xfce.xfce4-cpugraph-plugin
+      # xfce.xfce4-dict
+      # xfce.xfce4-fsguard-plugin
+      # xfce.xfce4-genmon-plugin
+      # xfce.xfce4-netload-plugin
+      # xfce.xfce4-panel
+      # xfce.xfce4-pulseaudio-plugin
+      # xfce.xfce4-systemload-plugin
+      # xfce.xfce4-weather-plugin
+      # xfce.xfce4-whiskermenu-plugin
+      # xfce.xfce4-xkb-plugin
+      # xfce.xfdashboard
       font-manager
       pkgs.bun # All in one fast & easy-to-use tool
       pkgs.home-manager # Home manager

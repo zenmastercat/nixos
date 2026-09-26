@@ -75,5 +75,8 @@
       trustedInterfaces = [ "docker0" ];
     };
     services.flatpak.enable = true; # For Flatpak services
+    # Bash -> Fish
+    programs.fish.enable = true;
+
   };
 }

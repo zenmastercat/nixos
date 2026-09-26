@@ -63,26 +63,43 @@
     # };
 
     # Desktop Environment (XFCE4 + LightDM on X11)
-    services.xserver = {
-      enable = true;
-      videoDrivers = [ "nvidia" ]; # Direct Xorg to render on the NVIDIA GPU
+    # services.xserver = {
+    #   enable = true;
+    #   videoDrivers = [ "nvidia" ]; # Direct Xorg to render on the NVIDIA GPU
       
-      displayManager.gdm.enable = false;
-      desktopManager.gnome.enable = false;
+    #   displayManager.gdm.enable = false;
+    #   desktopManager.gnome.enable = false;
       
-      displayManager.lightdm.enable = true;
-      desktopManager.xfce.enable = true;
-    };
+    #   displayManager.lightdm.enable = true;
+    #   desktopManager.xfce.enable = true;
+    # };
 
-    services.displayManager.defaultSession = "xfce";
+    # services.displayManager.defaultSession = "xfce";
+    # services.xserver = {
+    #   enable = true;
+    #   videoDrivers = [ "nvidia" ]; # Direct Xorg to render on the NVIDIA GPU
+      
+    #   displayManager.gdm.enable = false;
+    #   desktopManager.gnome.enable = false;
+      
+      
+    #   displayManager.lightdm.enable = false;
+    #   desktopManager.xfce.enable = false;
+    # };
+    services.desktopManager.plasma6.enable = true;
+    services.displayManager.sddm.enable = true;
+    services.displayManager.sddm.wayland.enable = true;
+
+
+    # services.displayManager.defaultSession = "gnome";
 
     # Global X11 Environment Variables
-    environment.sessionVariables = {
-      NIXOS_OZONE_WL = "0";
-      GDK_BACKEND = "x11";
-      QT_QPA_PLATFORM = "xcb";
-      SDL_VIDEODRIVER = "x11";
-    };
+    # environment.sessionVariables = {
+    #   NIXOS_OZONE_WL = "0";
+    #   GDK_BACKEND = "x11";
+    #   QT_QPA_PLATFORM = "xcb";
+    #   SDL_VIDEODRIVER = "x11";
+    # };
 
     # Networking & System Identification
     networking.hostName = "nixos";
@@ -90,8 +107,8 @@
 
     # Time & Regional Settings
     time.timeZone = "Asia/Bangkok";
-    # i18n.defaultLocale = "en_US.UTF-8";
-    i18n.defaultLocale = "ja_JP.UTF-8";
+    i18n.defaultLocale = "en_US.UTF-8";
+    # i18n.defaultLocale = "ja_JP.UTF-8";
     i18n.extraLocaleSettings = {
       LC_ADDRESS = "en_US.UTF-8";
       LC_IDENTIFICATION = "en_US.UTF-8";
