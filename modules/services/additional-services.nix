@@ -3,10 +3,13 @@
   flake.modules.nixos.additional-services = { pkgs, ... }: {
     # VirtualBox
     virtualisation.virtualbox = {
+      # host config
       host.enable = true;
       host.enableExtensionPack = true;
+      # guest config for screen stuff/ etc
       guest.enable = true;
       guest.dragAndDrop = true;
+      # guest.x11 = true;
     };
     # virtualisation.virtualbox.host = {
     #   enable = true;
