@@ -2,10 +2,18 @@
 {
   flake.modules.nixos.additional-services = { pkgs, ... }: {
     # VirtualBox
-    virtualisation.virtualbox.host = {
-      enable = true;
-      enableExtensionPack = true;
+    virtualisation.virtualbox = {
+      host.enable = true;
+      host.enableExtensionPack = true;
+      guest.enable = true;
+      guest.dragAndDrop = true;
     };
+    # virtualisation.virtualbox.host = {
+    #   enable = true;
+    #   enableExtensionPack = true;
+    # };
+    # virtualisation.virtualbox.guest.enable = true;
+    
 
     programs.firefox.enable = true;
     programs.steam = {
