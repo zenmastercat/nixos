@@ -161,7 +161,7 @@
     users.users.lucas = {
       isNormalUser = true;
       description = "Lucas";
-      extraGroups = [ "audio" "networkmanager" "wheel" "docker" "vboxusers" ];
+      extraGroups = [ "audio" "networkmanager" "wheel" "docker" "vboxusers" "render" "video" ];
       packages = with pkgs; [
         mousepad
         thunderbird

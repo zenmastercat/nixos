@@ -14,4 +14,17 @@ rebuild.home-manager:
 .PHONY: clean
 
 clean:
-	nix-collect-garbage -d
+	# Delete older boot generations
+               sudo nix-env --delete-generations old -p /nix/var/nix/profiles/system
+
+               # Collect garbage to free disk space
+               sudo nix-collect-garbage -d
+
+               # Rebuild your bootloader configuration to remove old EFI entries
+               sudo nixos-rebuild switch
+
+.PHONY: git-commit
+
+git-commit:
+	sudo git add .
+	sudo git commit -m "configgyuuu"
