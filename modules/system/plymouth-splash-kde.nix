@@ -5,7 +5,7 @@
       plymouth = {
         enable = true;
         # Optional: choose a specific theme package if you have one installed or packaged
-        # theme = "AccretionDisk"; 
+        theme = "solar"; 
       };
   
   # Quiet the kernel logs so text doesn't bleed through the splash screen
