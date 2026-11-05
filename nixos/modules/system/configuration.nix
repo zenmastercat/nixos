@@ -235,43 +235,72 @@
       self.nixosModules.plymouth-splash-kde
     ];
 
-    # Merged nix.settings block
-    nix.settings = {
-      experimental-features = [ "nix-command" "flakes" ];
-      max-jobs = "auto";
-      cores = 12;
-      substituters = [ "https://cache.nixos-cuda.org/" ];
-      trusted-public-keys = [ "cache.nixos-cuda.org-1:2hhlatXA9C9gld3u0N+J85z0dZ/9/Q16Z03l5w9d2d0=" ];
-    };
+# ─── NIX OPTIMIZATION ───────────────────────────────────────────
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    max-jobs = "auto";
+    cores = 12;
+    auto-optimise-store = true; # Automatically deduplicates store files to save space
+    
+    substituters = [
+      "https://cache.nixos.org/"
+      "https://cache.nixos-cuda.org/" # Your existing CUDA cache
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrA/PkbE84pW03oToM4a432Q="
+      "cache.nixos-cuda.org-1:2hhlatXA9C9gld3u0N+J85z0dZ/9/Q16Z03l5w9d2d0="
+    ];
+  };
+  
+  boot.loader.systemd-boot.configurationLimit = 3;
+  
+  # ─── I/O & STORAGE TUNING ───────────────────────────────────────
+  boot.kernel.sysctl = {
+    # Increase time before syncing data to disk (prevents system stuttering during heavy builds/updates)
+    "vm.dirty_expire_centisecs" = 6000;
+    "vm.dirty_writeback_centisecs" = 6000;
+    "vm.dirty_background_ratio" = 5;
+    "vm.dirty_ratio" = 10;
+  };
 
     # Nix Store Cleanup & Optimization
     nix.gc = {
       automatic = true;
       dates = "daily";
-      options = "--delete-older-than 7d";
+      options = "--delete-older-than 2d";
     };
 
     nix.optimise = {
       automatic = true;
-      dates = [ "weekly" ];
+      dates = [ "daily" ];
     };
 
     nixpkgs.config.allowUnfree = true;
 
     # Bootloader Setup
     boot.loader = {
-      systemd-boot.enable = false;
-      efi.canTouchEfiVariables = false;
+      systemd-boot.enable = lib.mkForce true;
+      efi.canTouchEfiVariables = lib.mkForce true;
       grub = {
-        enable = true;
-        device = "nodev";
-        efiSupport = true;
-        efiInstallAsRemovable = true;
+        enable = lib.mkForce false;
+        # device = "nodev";
+        # efiSupport = true;
+        # efiInstallAsRemovable = true;
       };
     };
 
     boot.initrd.kernelModules = [ "xe" ];
-    boot.kernelParams = [ "nvidia-drm.modeset=1" ];
+  # ─── CPU PERFORMANCE (Arrow Lake U9 285K) ──────────────────────
+  boot.kernelParams = [
+    "intel_iommu=on" "iommu=pt" # Enables IOMMU (Required for future GPU passthrough/VMs)
+  ];
+  boot.tmp.useTmpfs = false;
+  boot.tmp.cleanOnBoot = true;
+
+  powerManagement = {
+    enable = true;
+    cpuFreqGovernor = "performance"; # Keeps CPU clocks high for gaming/LLMs
+  };
 
     hardware.cpu.intel.updateMicrocode = true;
     hardware.enableAllFirmware = true;
@@ -347,7 +376,7 @@
       lucas = {
         isNormalUser = true;
         description = "Lucas";
-        extraGroups = [ "audio" "networkmanager" "wheel" "docker" "vboxusers" "render" "video" ];
+        extraGroups = [ "audio" "networkmanager" "wheel" "docker" "vboxusers" "render" "video" "lpadmin" ];
         packages = with pkgs; [ mousepad thunderbird ];
       };
       lucas-Thinkpad = {
@@ -372,6 +401,7 @@
       enable = true;
 
       extraRules = [{
+        groups = [ "wheel" ];
         persist = true;
       }];
     };

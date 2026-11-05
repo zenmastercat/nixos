@@ -1,7 +1,21 @@
-{ ... }:
+{ config, ... }:
+let
+  inherit (config.flake.modules) nixos;
+in
 {
-  flake.modules.nixos.additional-services = { config, pkgs, modulesPath, lib,  ... }: {
-    imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+  flake.modules.nixos.additional-services = { config, pkgs, modulesPath, lib, inputs, ... }: 
+  let
+    # Instantiate unstable packages directly for this module
+    unstablePkgs = import inputs.nixpkgs-unstable {
+      inherit (pkgs) system;
+      config.allowUnfree = true;
+    };
+  in {  
+    imports = [ 
+      nixos.virtualbox-host
+      nixos.virtualbox-guest
+      "${inputs.nixpkgs-unstable}/nixos/modules/services/misc/ollama.nix"
+    ];
 
     # Steam, Firefox, Java, GnuPG, Direnv
     programs.firefox.enable = true;
@@ -69,6 +83,13 @@
         "open-webui-data:/app/backend/data"
       ];
     };
+    
+    # For printers
+      # Enable CUPS printing service
+      services.printing.enable = true;
+      # services.printing.lpr.enable = true;
+      # services.printing.lpd.enable = true;
+      services.printing.browsed.enable = true;
 
     # SearXNG Service
     services.searx = {
@@ -91,11 +112,12 @@
         };
       };
     };
-
+    
+    disabledModules = [ "services/misc/ollama.nix" ];
     # Ollama Service (Optimized for RTX 5080 16GB)
     services.ollama = {
       enable = true;
-      package = pkgs.ollama-cuda;
+      package = unstablePkgs.ollama-cuda;
       host = "0.0.0.0";
       port = 11434;
       environmentVariables = {
@@ -146,9 +168,16 @@
     # Firewall (อนุญาต Port และ Docker Interface)
     networking.firewall = {
       enable = true;
-      allowedTCPPorts = [ 11434 3000 ];
+      allowedTCPPorts = [ 11434 3000 631 ];
       trustedInterfaces = [ "docker0" ];
     };
+
+    services.rustdesk-server = {
+      enable = true;
+      openFirewall = true;
+      # signal.relayHosts = ["example.com"];
+    };
+
 
     # Remotely use nixos on any kde desktop enviroment machine
     # services.xrdp = {

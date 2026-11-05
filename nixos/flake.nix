@@ -82,6 +82,9 @@
     # Pin nixpkgs to follow nix-ros-overlay to prevent GCC 14 build failures
     nixpkgs.follows = "nix-ros-overlay/nixpkgs";
 
+    # Unstable Packages for the overlay
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+
     # Home-manager
     home-manager = {
       url = "github:nix-community/home-manager/master";
@@ -91,6 +94,12 @@
     # Noctalia Desktop Shell
     noctalia = {
       url = "github:noctalia-dev/noctalia";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Caelestia Shell
+    caelestia-shell = {
+      url = "github:caelestia-dots/shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -104,11 +113,21 @@
     import-tree.url = "github:vic/import-tree";
   };
 
-  outputs = inputs @ { flake-parts, import-tree, ... }:
+  outputs = inputs @ { flake-parts, import-tree, nixpkgs-unstable, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.flake-parts.flakeModules.modules
         (import-tree ./modules)
       ];
+
+      # Export the unstable overlay so it can be consumed by your dendritic modules
+      flake = {
+        overlays.unstable = final: prev: {
+          unstable = import nixpkgs-unstable {
+            system = prev.system;
+            config.allowUnfree = true;
+          };
+        };
+      };
     };
 }

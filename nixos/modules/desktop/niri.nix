@@ -180,7 +180,7 @@
             shake-to-enlarge {
                 grow
                 grow-speed 0.1
-                threshold 900
+                threshold 1500
                 hold-duration-ms 1500
                 zoom-factor 5
             }
@@ -193,7 +193,7 @@
         }
 
         input {
-            focus-follows-mouse
+            // focus-follows-mouse
 
             keyboard {
                 xkb {
@@ -204,10 +204,22 @@
         }
 
         layout {
-            focus-ring {
-                off
+        //     focus-ring {
+        //         off
+        //     }
+        // }
+	    focus-ring {
+               // off
+               on
+               width 4
+               active-color "#7fc8ff"
+               inactive-color "#505050"
+               urgent-color "#9b0000"
+               // active-gradient from="#80c8ff" to="#bbddff" angle=45
+               // inactive-gradient from="#505050" to="#808080" angle=45 relative-to="workspace-view"
+               // urgent-gradient from="#800" to="#a33" angle=45
             }
-        }
+	}
 
         // Dual Monitor Configuration
         output "DP-2" {
@@ -224,7 +236,9 @@
 
         // Keybindings
         binds {
-            Mod+Return { spawn "alacritty"; }
+//            Mod+Return { spawn "alacritty"; }
+            Mod+T { spawn "alacritty"; }
+
             Mod+Space  { spawn "fuzzel"; }
             Mod+Q      { close-window; }
 
@@ -232,6 +246,10 @@
             Mod+Right { focus-column-right; }
             Mod+Down  { focus-window-down; }
             Mod+Up    { focus-window-up; }
+            Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+            Mod+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
+            Mod+WheelScrollRight                { focus-column-right; }
+            Mod+WheelScrollLeft                 { focus-column-left; }
 
             Mod+Shift+Left  { move-column-left; }
             Mod+Shift+Right { move-column-right; }

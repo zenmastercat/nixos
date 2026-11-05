@@ -1,6 +1,6 @@
 { ... }:
 {
-  flake.modules.nixos.styupideasyapps = { pkgs, ... }: {
+  flake.modules.nixos.styupideasyapps = { pkgs, inputs, ... }: {
     environment.systemPackages = with pkgs; [
       btop
       tmux
@@ -11,14 +11,29 @@
       pciutils
       pkgs.ungoogled-chromium
       pkgs.kdePackages.dolphin
-      pkgs.virtualbox
       pkgs.winboat
       freerdp
+      
       pkgs.cups-brother-dcp1610wlpr
+      # brother
+      cups
+      cups-browsed
+
       pkgs.openssh
       mailspring
       pkgs.kdePackages.kwallet
       pkgs.kdePackages.kwalletmanager
+     
+      # winetricks (all versions)
+      winetricks
+      wineWow64Packages.stable
+
+      pkgs.vivaldi
+      inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+
+      pkgs.rustdesk
+
+      unzip
     ];
   };
 }

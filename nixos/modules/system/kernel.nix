@@ -69,61 +69,63 @@
 {
   flake.nixosModules.customKernel = { config, pkgs, lib, ... }: {
     
-    # ─── KERNEL SELECTION ──────────────────────────────────────────
-    # Using XanMod for lower latency and better scheduler performance.
-    # NOTE: If you encounter any hardware instability with the 285K/5080, 
-    # you can switch this to pkgs.linuxPackages_xanmod_edge for newer upstream patches.
-    boot.kernelPackages = pkgs.linuxPackages_xanmod_latest; 
+        # ─── KERNEL SELECTION ──────────────────────────────────────────
+    # Uses lib.mkDefault so specialisations can override it cleanly without errors
+    boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_xanmod_latest;
 
     # ─── NVIDIA & GRAPHICS OPTIMIZATION ──────────────────────────
-    # Required for the RTX 5080 (Blackwell) and Dual Monitor stability.
     hardware.graphics = {
       enable = true;
       enable32Bit = true;
+      extraPackages = with pkgs; [
+        vulkan-tools # For checking Vulkan driver health
+      ];
     };
 
-    services.xserver.videoDrivers = [ "nvidia" ]; 
+    services.xserver.videoDrivers = [ "nvidia" ];
 
     hardware.nvidia = {
-      # Mandatory for 50-series and dual-monitor refresh rate handling.
-      modesetting.enable = true; 
-      prime = {
-        offload = {
-          enable = true;
-          enableOffloadCmd = true;
-        };
-        # Find these IDs using `lspci | grep -E "VGA|3D"`
-        intelBusId = "PCI:0:2:0";   # Replace with your Integrated GPU ID
-        nvidiaBusId = "PCI:2:0:0";  # Replace with your Dedicated GPU ID
+      modesetting.enable = true;
+      #---for using less electricity---
+       prime = {
+         offload = {
+           enable = true;
+           enableOffloadCmd = true;
+         };
+      #---better performance but more electricity---
+      #  sync.enable = true;
+        intelBusId = "PCI:0:2:0";
+        nvidiaBusId = "PCI:2:0:0";
       };
-      open = true; 
-      
-      # Set to true if you want the GPU to enter low-power states; 
-      # leave false for maximum raw performance/constant clock speeds.
-      powerManagement.enable = false; 
-      
-      # Use the production driver for maximum stability
+      open = true;
+      powerManagement.enable = false; # Disabled to prevent clock downshifting during gaming/LLMs
       package = config.boot.kernelPackages.nvidiaPackages.latest;
     };
 
     # ─── PERFORMANCE & STABILITY TWEAKS ──────────────────────────
-    
-    # 1. Early Loading: Prevents resolution flickering on dual monitors during boot
     boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
-    # 2. CPU Performance: Force the U9 285K into performance mode
-    # This prevents the kernel from aggressively downclocking the P-cores.
-    boot.kernelParams = [ 
-      "intel_pstate=active" 
-      "nvidia-drm.modeset=1" 
+    boot.kernelParams = [
+      "intel_pstate=active"
+      "nvidia-drm.modeset=1"
     ];
-    # Required for the Intel 285K (Arrow Lake)
+
     hardware.cpu.intel.updateMicrocode = true;
-    # 3. Memory Optimization: Transparent Huge Pages (THP)
-    # Helps with high-memory workloads on 32GB+ systems
-    boot.kernel.sysctl = {
-      "vm.nr_hugepages" = 0; # Let the system manage them dynamically
-      "vm.swappiness" = 10;  # Reduce swapping to keep performance in RAM
+
+    # ─── SPECIALISATIONS ──────────────────────────────────────────
+    specialisation = {
+      zen = {
+        configuration = {
+          system.nixos.tags = [ "zen-kernel" ];
+          boot.kernelPackages = pkgs.linuxPackages_zen;
+        };
+      };
+      stable = {
+        configuration = {
+          system.nixos.tags = [ "stable-kernel" ];
+          boot.kernelPackages = pkgs.linuxPackages;
+        };
+      };
     };
   };
 }
